@@ -1,6 +1,6 @@
-import { ValidationError } from '../error.js';
-import type { Infer } from '../infer.js';
-import { Schema } from './primitives.js';
+import { ValidationError } from '../error';
+import type { Infer } from '../infer';
+import { Schema } from './primitives';
 
 type InferShape<Shape extends Record<string, Schema<any>>> = {
 	[Key in keyof Shape]: Infer<Shape[Key]>;

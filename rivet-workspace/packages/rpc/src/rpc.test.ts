@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { object, string } from '../../schema/src/index.js';
-import { createRivetClient, type RivetClient } from './client/create-client.js';
-import { procedure } from './server/procedure.js';
-import { router } from './server/router.js';
+import { object, string } from '../../schema/src/index';
+import { createRivetClient, type RivetClient } from './client/create-client';
+import { procedure } from './server/procedure';
+import { router } from './server/router';
 
 type Equal<Left, Right> = [Left] extends [Right]
 	? [Right] extends [Left]

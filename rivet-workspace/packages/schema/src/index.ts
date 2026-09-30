@@ -1,6 +1,6 @@
-export { ValidationError } from './error.js';
-export type { Infer } from './infer.js';
-export { object, ObjectSchema } from './types/object.js';
+export { ValidationError } from './error';
+export type { Infer } from './infer';
+export { object, ObjectSchema } from './types/object';
 export {
 	array,
 	literal,
@@ -12,7 +12,7 @@ export {
 	NullableSchema,
 	OptionalSchema,
 	UnionSchema,
-} from './types/modifiers.js';
+} from './types/modifiers';
 export {
 	boolean,
 	number,
@@ -21,5 +21,5 @@ export {
 	NumberSchema,
 	Schema,
 	StringSchema,
-} from './types/primitives.js';
-export type { SafeParseResult } from './types/primitives.js';
+} from './types/primitives';
+export type { SafeParseResult } from './types/primitives';

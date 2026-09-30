@@ -1,6 +1,6 @@
-import { ValidationError } from '../error.js';
-import type { Infer } from '../infer.js';
-import { Schema } from './primitives.js';
+import { ValidationError } from '../error';
+import type { Infer } from '../infer';
+import { Schema } from './primitives';
 
 export class ArraySchema<TSchema extends Schema<any>> extends Schema<Infer<TSchema>[]> {
 	constructor(private readonly itemSchema: TSchema) {

@@ -1,7 +1,7 @@
-import type { ObjectSchema } from './types/object.js';
-import type { Schema } from './types/primitives.js';
-import { number, string } from './types/primitives.js';
-import { object } from './types/object.js';
+import type { ObjectSchema } from './types/object';
+import type { Schema } from './types/primitives';
+import { number, string } from './types/primitives';
+import { object } from './types/object';
 
 export type Infer<T> = T extends ObjectSchema<infer Shape>
 	? { [Key in keyof Shape]: Infer<Shape[Key]> }

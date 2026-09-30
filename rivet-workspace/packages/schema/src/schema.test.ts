@@ -10,7 +10,7 @@ import {
 	optional,
 	string,
 	union,
-} from './index.js';
+} from './index';
 
 type Equal<Left, Right> = [Left] extends [Right]
 	? [Right] extends [Left]

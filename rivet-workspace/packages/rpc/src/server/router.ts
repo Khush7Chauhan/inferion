@@ -1,4 +1,4 @@
-import type { Procedure } from './procedure.js';
+import type { Procedure } from './procedure';
 
 export type RouterRecord = Record<string, Procedure<any, any> | Router<any>>;
 

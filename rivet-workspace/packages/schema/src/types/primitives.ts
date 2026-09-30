@@ -1,4 +1,4 @@
-import { ValidationError } from '../error.js';
+import { ValidationError } from '../error';
 
 export type SafeParseResult<T> =
 	| { success: true; data: T }

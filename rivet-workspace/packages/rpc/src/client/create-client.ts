@@ -1,5 +1,5 @@
-import type { AppRouter, Router } from '../server/router.js';
-import type { Procedure } from '../server/procedure.js';
+import type { AppRouter, Router } from '../server/router';
+import type { Procedure } from '../server/procedure';
 
 type ClientNode<T> = T extends Procedure<infer TInput, infer TOutput>
 	? (input: TInput) => Promise<TOutput>

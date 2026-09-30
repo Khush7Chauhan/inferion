@@ -1,7 +1,7 @@
-import { object, string } from '../../schema/src/index.js';
-import { type RivetClient } from './client/create-client.js';
-import { procedure } from './server/procedure.js';
-import { router } from './server/router.js';
+import { object, string } from '../../schema/src/index';
+import { type RivetClient } from './client/create-client';
+import { procedure } from './server/procedure';
+import { router } from './server/router';
 
 const appRouter = router({
 	users: router({

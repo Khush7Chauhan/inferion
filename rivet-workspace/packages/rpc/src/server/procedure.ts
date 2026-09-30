@@ -1,5 +1,5 @@
-import type { Infer } from '../../../schema/src/infer.js';
-import type { Schema } from '../../../schema/src/types/primitives.js';
+import type { Infer } from '../../../schema/src/infer';
+import type { Schema } from '../../../schema/src/types/primitives';
 
 export type ProcedureMethod = 'GET' | 'POST';
 
