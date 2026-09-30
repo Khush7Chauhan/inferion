@@ -1,9 +1,26 @@
 import { ValidationError } from '../error.js';
 
+export type SafeParseResult<T> =
+	| { success: true; data: T }
+	| { success: false; error: ValidationError };
+
 export abstract class Schema<T> {
 	protected _type!: T;
 
 	abstract parse(value: unknown): T;
+
+	safeParse(value: unknown): SafeParseResult<T> {
+		try {
+			return { success: true, data: this.parse(value) };
+		} catch (error) {
+			if (error instanceof ValidationError) {
+				return { success: false, error };
+			}
+
+			const message = error instanceof Error ? error.message : 'Validation failed';
+			return { success: false, error: new ValidationError(message) };
+		}
+	}
 }
 
 export class StringSchema extends Schema<string> {

@@ -1,8 +1,9 @@
 import { ValidationError } from '../error.js';
+import type { Infer } from '../infer.js';
 import { Schema } from './primitives.js';
 
 type InferShape<Shape extends Record<string, Schema<any>>> = {
-	[Key in keyof Shape]: Shape[Key] extends Schema<infer Type> ? Type : never;
+	[Key in keyof Shape]: Infer<Shape[Key]>;
 };
 
 export class ObjectSchema<Shape extends Record<string, Schema<any>>> extends Schema<InferShape<Shape>> {
