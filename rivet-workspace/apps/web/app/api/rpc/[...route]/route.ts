@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
 import { appRouter } from '../../../../server/root-router';
+import { RpcError } from '../../../../../../packages/rpc/src/server/router';
 
 type RouteContext = {
 	params: Promise<{ route: string[] }>;
 };
 
 async function executeRpc(
+	request: Request,
 	params: Promise<{ route: string[] }>,
 	payload: unknown,
 ): Promise<NextResponse> {
@@ -13,11 +15,14 @@ async function executeRpc(
 	const path = route.join('.');
 
 	try {
-		const data = await appRouter.execute(path, payload);
+		const data = await appRouter.execute(path, payload, request.method as 'GET' | 'POST');
 		return NextResponse.json(data);
 	} catch (error) {
-		const message = error instanceof Error ? error.message : 'RPC request failed';
-		return NextResponse.json({ error: message }, { status: 400 });
+		if (error instanceof RpcError) {
+			return NextResponse.json({ error: { code: error.code, message: error.message } }, { status: error.statusCode });
+		}
+
+		return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: 'Internal RPC error' } }, { status: 500 });
 	}
 }
 
@@ -25,7 +30,7 @@ export async function GET(request: Request, { params }: RouteContext): Promise<N
 	const searchParams = new URL(request.url).searchParams;
 	const payload = Object.fromEntries(searchParams.entries());
 
-	return executeRpc(params, payload);
+	return executeRpc(request, params, payload);
 }
 
 export async function POST(request: Request, { params }: RouteContext): Promise<NextResponse> {
@@ -37,5 +42,5 @@ export async function POST(request: Request, { params }: RouteContext): Promise<
 		return NextResponse.json({ error: 'Request body must be valid JSON' }, { status: 400 });
 	}
 
-	return executeRpc(params, payload);
+	return executeRpc(request, params, payload);
 }

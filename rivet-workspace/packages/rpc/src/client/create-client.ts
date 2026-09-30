@@ -38,7 +38,8 @@ export function createRivetClient<TRouter>({ url }: { url: string }): RivetClien
 				body: method === 'GET' ? undefined : JSON.stringify(input),
 			}).then(async response => {
 				if (!response.ok) {
-					throw new Error(`RPC request failed: ${response.status} ${response.statusText}`);
+					const body = await response.json().catch(() => undefined) as { error?: { message?: string } } | undefined;
+					throw new Error(body?.error?.message ?? `RPC request failed: ${response.status} ${response.statusText}`);
 				}
 
 				return response.json();

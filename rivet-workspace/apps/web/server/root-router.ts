@@ -2,6 +2,8 @@ import { router } from '../../../packages/rpc/src/server/router';
 import { procedure } from '../../../packages/rpc/src/server/procedure';
 import { object } from '../../../packages/schema/src/types/object';
 import { array, boolean, literal, optional, string, union } from '../../../packages/schema/src/index';
+import { JsonStore } from '../../../packages/db/src/json-store';
+import { join } from 'node:path';
 
 const taskSchema = object({
 	id: string(),
@@ -21,7 +23,7 @@ const projectSchema = object({
 
 type Project = ReturnType<typeof projectSchema.parse>;
 
-let projects: Project[] = [
+const initialProjects: Project[] = [
 	{
 		id: 'proj-1',
 		name: 'TypeForge launch',
@@ -47,12 +49,14 @@ let projects: Project[] = [
 	},
 ];
 
+const projectStore = new JsonStore(join(process.cwd(), '.data', 'projects.json'), initialProjects);
+
 export const appRouter = router({
 	project: router({
-		list: procedure().input(object({})).query(() => projects),
+		list: procedure().input(object({})).query(() => projectStore.read()),
 		create: procedure()
 			.input(object({ name: string(), description: optional(string()) }))
-			.mutation(input => {
+			.mutation(async input => {
 				const project: Project = {
 					id: `proj-${Date.now()}`,
 					name: input.name,
@@ -62,27 +66,37 @@ export const appRouter = router({
 					tasks: [],
 				};
 
-				projects = [project, ...projects];
-				return project;
+				const projects = await projectStore.update(current => [project, ...current]);
+				return projects[0];
 			}),
 		toggleTask: procedure()
 			.input(object({ projectId: string(), taskId: string() }))
-			.mutation(input => {
-				const project = projects.find(item => item.id === input.projectId);
+			.mutation(async input => {
+				const projects = await projectStore.update(current => {
+					const project = current.find(item => item.id === input.projectId);
 
-				if (!project) {
-					throw new Error('Project not found');
-				}
+					if (!project) {
+						throw new Error('Project not found');
+					}
 
-				const task = project.tasks.find(item => item.id === input.taskId);
+					const task = project.tasks.find(item => item.id === input.taskId);
 
-				if (!task) {
-					throw new Error('Task not found');
-				}
+					if (!task) {
+						throw new Error('Task not found');
+					}
 
-				task.done = !task.done;
-				project.updatedAt = new Date().toISOString();
-				return project;
+					return current.map(item => item.id === project.id
+						? {
+							...item,
+							updatedAt: new Date().toISOString(),
+							tasks: item.tasks.map(candidate => candidate.id === task.id
+								? { ...candidate, done: !candidate.done }
+								: candidate),
+						}
+						: item);
+				});
+
+				return projects.find(item => item.id === input.projectId)!;
 			}),
 	}),
 });

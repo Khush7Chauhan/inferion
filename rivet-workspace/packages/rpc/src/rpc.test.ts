@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { object, string } from '../../schema/src/index';
 import { createRivetClient, type RivetClient } from './client/create-client';
 import { procedure } from './server/procedure';
-import { router } from './server/router';
+import { router, RpcError } from './server/router';
 
 type Equal<Left, Right> = [Left] extends [Right]
 	? [Right] extends [Left]
@@ -39,6 +39,20 @@ describe('Phase 2 RPC', () => {
 	it('rejects invalid procedure input before the resolver runs', async () => {
 		await expect(appRouter.execute('users.get', { id: 42 })).rejects.toThrow(
 			'Expected a string, received number',
+		);
+	});
+
+	it('enforces the procedure HTTP method', async () => {
+		await expect(appRouter.execute('users.get', { id: 'user-1' }, 'POST')).rejects.toMatchObject({
+			name: 'RpcError',
+			code: 'METHOD_NOT_ALLOWED',
+			statusCode: 405,
+		});
+	});
+
+	it('returns structured errors for unknown procedures', async () => {
+		await expect(appRouter.execute('users.missing', {}, 'GET')).rejects.toEqual(
+			new RpcError('NOT_FOUND', 'Procedure not found: users.missing', 404),
 		);
 	});
 
