@@ -13,8 +13,8 @@ type RouterShape<TRouter> = TRouter extends Router<infer TRoutes>
 
 export type RivetClient<TRouter> = ClientNode<RouterShape<TRouter>>;
 
-export function createRivetClient<TRouter>(baseUrl: string): RivetClient<TRouter> {
-	const rootUrl = baseUrl.replace(/\/$/, '');
+export function createRivetClient<TRouter>({ url }: { url: string }): RivetClient<TRouter> {
+	const rootUrl = url.replace(/\/$/, '');
 
 	const createProxy = (path: string[]): object => new Proxy(() => undefined, {
 		get(_target, property) {
@@ -27,9 +27,12 @@ export function createRivetClient<TRouter>(baseUrl: string): RivetClient<TRouter
 		apply(_target, _thisArg, [input]) {
 			const operation = path.at(-1)?.toLowerCase();
 			const method = operation === 'get' ? 'GET' : 'POST';
-			const url = `${rootUrl}/api/rpc/${path.slice(0, -1).join('.')}`;
+			const endpoint = `${rootUrl}/${path.join('.')}`;
+			const query = method === 'GET' && input && typeof input === 'object'
+				? `?${new URLSearchParams(input as Record<string, string>).toString()}`
+				: '';
 
-			return fetch(url, {
+			return fetch(`${endpoint}${query}`, {
 				method,
 				headers: { 'Content-Type': 'application/json' },
 				body: method === 'GET' ? undefined : JSON.stringify(input),
