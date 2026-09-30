@@ -35,4 +35,6 @@ export class ProcedureBuilder<TInput = undefined> {
 	}
 }
 
-export const procedure = new ProcedureBuilder();
+export function procedure(): ProcedureBuilder {
+	return new ProcedureBuilder();
+}

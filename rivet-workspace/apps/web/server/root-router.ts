@@ -5,7 +5,7 @@ import { string } from '../../../packages/schema/src/types/primitives';
 
 export const appRouter = router({
 	user: router({
-		get: procedure
+		get: procedure()
 			.input(object({ id: string() }))
 			.query(input => ({ id: input.id })),
 	}),
